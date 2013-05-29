@@ -5,12 +5,21 @@
 
 (def server (atom nil))
 
+(def open-connections (ref []))
+
 (defroutes server-routes
   (GET "/ws" []
        (fn [req]
          (with-channel req channel
+           (dosync
+            (alter open-connections conj channel))
+           (println "WS connection opened")
            (on-close channel (fn [status]
-                               (println "Channel closed " status)))
+                               (dosync
+                                (alter open-connections
+                                       #(remove (partial = channel) %)))
+                               (println "Channel closed " status)
+                               (println "Connections left " (count @open-connections))))
            (on-receive channel (fn [data]
                                  (println "Data " data))))))
   (resources "public"))
