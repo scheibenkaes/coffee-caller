@@ -18,7 +18,8 @@
    (alter open-connections conj channel)))
 
 (defn send-to-all [connections data]
-  (doseq [con connections]
+  (println "sending to all connections " (count @connections))
+  (doseq [con @connections]
     (send! con data)))
 
 (defn ws-handler [req]
@@ -38,7 +39,7 @@
   (resources "public"))
 
 (defn start-server []
-  (udp/init println)
+  (udp/init #(send-to-all open-connections %))
   (reset! server (run-server server-routes {:port 8080})))
 
 (defn stop-server []
