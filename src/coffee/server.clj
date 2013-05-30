@@ -1,7 +1,8 @@
 (ns coffee.server
   (:use compojure.core
         compojure.route
-        org.httpkit.server))
+        org.httpkit.server)
+  (:require [coffee.upd :as udp]))
 
 (def server (atom nil))
 
@@ -37,6 +38,7 @@
   (resources "public"))
 
 (defn start-server []
+  (udp/init println)
   (reset! server (run-server server-routes {:port 8080})))
 
 (defn stop-server []
