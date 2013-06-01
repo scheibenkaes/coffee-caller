@@ -20,7 +20,10 @@
 (defn send-to-all [connections data]
   (println "sending to all connections " (count @connections))
   (doseq [con @connections]
-    (send! con data)))
+    (try
+      (send! con data)
+      (catch Exception e
+        (println e)))))
 
 (defn ws-handler [req]
   (with-channel req channel
@@ -31,8 +34,8 @@
                         (println "Channel closed " status)
                         (println "Connections left " (count @open-connections))))
     (on-receive channel (fn [data]
-                          (println "Data " data)
-                          (send-to-all @open-connections data)))))
+                          (println "Received " data " from WebSocket")
+                          (udp/send-multicast (str data))))))
 
 (defroutes server-routes
   (GET "/ws" [] ws-handler)
