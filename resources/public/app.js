@@ -2,28 +2,39 @@ function calcLightState(oldState){
     return oldState;
 }
 
+function interpretMsg(msg){
+    if (msg.startsWith("green")) {
+        return "green";
+    } else if (msg.startsWith("red")){
+        return "red";
+    } else {
+        return "yellow";
+    }
+}
+
 function Controller($scope){        
     $scope.light = null;
 
     $scope.$watch('light', function(newValue, oldValue){
         if(!newValue) {
             angular.forEach(['green', 'red', 'yellow'], function(col){
-                document.getElementById(col).className = null;
+                angular.element(document.getElementById(col)).removeClass("lit");
             });
         } else {
-            angular.element('#' + newValue).addClass("lit");
-//            document.getElementById(newValue).className = "lit";
+            var elm = interpretMsg(newValue);
+            angular.element(document.getElementById(elm)).addClass("lit");
         }
     });
 
     $scope.sendRequest = function(){
-        $scope.light = "red";
+        $scope.light = null;
     };
     
     var ws = new WebSocket("ws://localhost:8080/ws");
     ws.onmessage = function(msg){
-        console.log(msg.data);
-        $scope.light = calcLightState(msg.data.trim());
-        $scope.$digest();
+        $scope.$apply(function(){
+            $scope.light = calcLightState(msg.data);
+        });
     };
 }
+
