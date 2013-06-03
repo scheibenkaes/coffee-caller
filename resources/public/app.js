@@ -1,16 +1,10 @@
 function calcLightState(oldState){
-    return oldState;
+    return oldState.noWhitespace();
 }
 
-function interpretMsg(msg){
-    if (msg.startsWith("green")) {
-        return "green";
-    } else if (msg.startsWith("red")){
-        return "red";
-    } else {
-        return "yellow";
-    }
-}
+String.prototype.noWhitespace = function(){
+    return this.match(/(\w+)/)[0];
+};
 
 function Controller($scope){        
     $scope.light = null;
@@ -21,8 +15,7 @@ function Controller($scope){
                 angular.element(document.getElementById(col)).removeClass("lit");
             });
         } else {
-            var elm = interpretMsg(newValue);
-            angular.element(document.getElementById(elm)).addClass("lit");
+            angular.element(document.getElementById(newValue)).addClass("lit");
         }
     });
 
