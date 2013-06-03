@@ -15,13 +15,16 @@
     (receive-fn (-> pack .getData String.))
     (recur receive-fn)))
 
-(defn send-multicast [^String data]
-  (let [bytes (.getBytes data)
-        pack (java.net.DatagramPacket. bytes (count bytes) group 8005)]
-    (try
-      (.send @socket pack)
-      (catch Exception e
-        (println (format "Error on sending multicast package %s.\n%s" data e))))))
+(defn send-multicast
+  ([^String data]
+     (send-multicast @socket data))
+  ([^MulticastSocket sock ^String data]
+     (let [bytes (.getBytes data)
+           pack (java.net.DatagramPacket. bytes (count bytes) group 8005)]
+       (try
+         (.send sock pack)
+         (catch Exception e
+           (println (format "Error on sending multicast package %s.\n%s" data e)))))))
 
 (defn init [msg-fn]
   (let [sock (doto (MulticastSocket. port)
