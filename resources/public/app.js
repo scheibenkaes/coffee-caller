@@ -40,7 +40,7 @@ function Controller($scope){
 
     $scope.uuid = Date.now().toString() + Math.random().toString();
     
-    $scope.curState = {cnt: 0, light: null};
+    $scope.curState = {cnt: 0, light: null, nextMsgToBeSent: 'REQ'};
 
     $scope.$watch('light', function(newValue, oldValue){
         if(!newValue) {
